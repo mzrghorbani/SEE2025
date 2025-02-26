@@ -1,0 +1,63 @@
+Release Notes for Space Master v 1.4.14
+=======================================
+
+OVERVIEW
+--------
+
+Extension of license period and updated for SEE 2024.
+
+
+Release Notes for Space Master v 1.4.13
+=======================================
+
+OVERVIEW
+--------
+
+Extension of license period for 2023. No functional changes.
+
+
+Release Notes for Space Master v 1.4.12
+=======================================
+
+OVERVIEW
+--------
+
+Fixes nonconformance to SISO SpaceFOM v1.0 specification regarding transitions
+to EXEC_MODE_FREEZE.
+
+DETAILS
+-------
+
+1. Fixed executive mode transition time. Space Master would not transition to
+   EXEC_MODE_FREEZE at the scenario time published by ExCO unless this time was
+   multiple of 1 second. This problem is now fixed.
+
+2. ExCO's next_mode_scenario_time attribute is now properly expressed in seconds
+   since the Truncated Julian Date epoch, as SpaceFOM v1.0 specifies. The
+   timestamp was expressed in days before.
+
+3. Minor internal code clean ups.
+
+
+Release Notes for Space Master v 1.4.11
+=======================================
+
+OVERVIEW
+--------
+
+Addresses some errors that could occur due to race conditions.
+
+DETAILS
+-------
+
+1. Fixed a ConcurrentModificationException error that could occur during the
+   discovery of required federates.
+
+2. Fixed a HLANotConnectedException error when transitioning to
+   EXEC_MODE_SHUTDOWN.
+
+3. SpaceMaster now disconnects immediately on shutdown when the option
+   master.federation.mtr.shutdown=false. In 1.4.10 and earlier, SpaceMaster
+   would stay connected until the user pressed a key, which could block
+   federates that did not properly coordinate time advancing with the shutdown
+   procedure.

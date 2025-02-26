@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ObjectInfo version="1.0">
+    <OriginalFileInformation>
+        <File file="SimplePlane.obj" type="Geometry" creationDate="2025-02-21T11:09:02.2187608Z" lastWriteDate="2025-02-21T11:08:50.9903752Z" SHA1Hash="8e7a86041b84ce5925a32088937d3460bf1f479f" />
+    </OriginalFileInformation>
+    <Materials />
+    <Meshes totalTriangles="0" totalVertices="0">
+        <Mesh name="SimplePlane.obj_Mesh" triangles="0" vertices="0">
+            <SubMeshes>
+                <SubMesh triangles="0" vertices="0">
+                    <SubMeshMaterials />
+                </SubMesh>
+            </SubMeshes>
+        </Mesh>
+    </Meshes>
+</ObjectInfo>

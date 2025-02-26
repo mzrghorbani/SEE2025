@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ObjectInfo version="1.0">
+    <OriginalFileInformation>
+        <File file="SimplePad.obj" type="Geometry" creationDate="2025-02-21T11:21:22.8732094Z" lastWriteDate="2025-02-21T11:20:56.5539192Z" SHA1Hash="eb2ab902c70afa426eeb9b42de985fa10a4c0dec" />
+        <File file="C:\Users\mazia\SEE2025\DON-Simulation-Directory\models\SimplePad.mtl " type="Materials" creationDate="0001-01-01T00:00:00.0000000" lastWriteDate="0001-01-01T00:00:00.0000000" SHA1Hash="" />
+    </OriginalFileInformation>
+    <Materials>
+        <Material id="default" name="default" shaderName="Specular">
+            <Attributes>
+                <Transparency value="1" />
+                <Color type="_Color" value="1 0 0 1" />
+                <Color type="_SpecColor" value="1 1 1 1" />
+                <Scalar type="_Shininess" value="0.5" />
+            </Attributes>
+        </Material>
+    </Materials>
+    <Meshes totalTriangles="124" totalVertices="192">
+        <Mesh name="SimplePad.obj_Mesh" triangles="124" vertices="192">
+            <SubMeshes>
+                <SubMesh triangles="124" vertices="192">
+                    <SubMeshMaterials>
+                        <SubMeshMaterial index="0" />
+                    </SubMeshMaterials>
+                </SubMesh>
+            </SubMeshes>
+        </Mesh>
+    </Meshes>
+</ObjectInfo>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<objectModel
+	xmlns:schemaLocation="http://standards.ieee.org/IEEE1516-2010"
+	xmlns="http://standards.ieee.org/IEEE1516-2010"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelIdentification>
+		<name>New Module</name>
+		<type>FOM</type>
+		<version>1.0</version>
+		<securityClassification>unclassified</securityClassification>
+		<purpose></purpose>
+		<applicationDomain></applicationDomain>
+		<description>Description of MyModule</description>
+		<useLimitation></useLimitation>
+		<other></other>
+	</modelIdentification>
+	<objects>
+		<objectClass>
+			<name>HLAobjectRoot</name>
+			<objectClass>
+				<name>PhysicalEntity</name>
+				<objectClass>
+					<name>Spaceport</name>
+					<sharing>PublishSubscribe</sharing>
+					<semantics></semantics>
+				</objectClass>
+			</objectClass>
+			<objectClass>
+					<name>Lander</name>
+					<sharing>PublishSubscribe</sharing>
+					<semantics></semantics>
+                </objectClass>
+                <objectClass>
+                    <name>Position</name>
+                    <dataType>HLAPositionCoder</dataType>
+                    <sharing>PublishSubscribe</sharing>
+                    <semantics></semantics>
+                    <dataType>
+                        <name>x</name>
+                        <dataType>HLAfloat64BE</dataType>
+                        <updateType>NA</updateType>
+                        <updateCondition></updateCondition>
+                        <ownership>NoTransfer</ownership>
+                        <sharing>PublishSubscribe</sharing>
+                        <transportation>HLAreliable</transportation>
+                        <order>Receive</order>
+                        <semantics></semantics>
+                    </dataType>
+                    <dataType>
+                        <name>y</name>
+                        <dataType>HLAfloat64BE</dataType>
+                        <updateType>NA</updateType>
+                        <updateCondition></updateCondition>
+                        <ownership>NoTransfer</ownership>
+                        <sharing>PublishSubscribe</sharing>
+                        <transportation>HLAreliable</transportation>
+                        <order>Receive</order>
+                        <semantics></semantics>
+                    </dataType>
+                    <dataType>
+                        <name>z</name>
+                        <dataType>HLAfloat64BE</dataType>
+                        <updateType>NA</updateType>
+                        <updateCondition></updateCondition>
+                        <ownership>NoTransfer</ownership>
+                        <sharing>PublishSubscribe</sharing>
+                        <transportation>HLAreliable</transportation>
+                        <order>Receive</order>
+                        <semantics></semantics>
+                    </dataType>
+                </objectClass>
+            </objectClass>
+	</objects>
+	<interactions>
+		<name>HLAinteractionRoot</name>
+		<!-- ✅ Existing MTR/Execution Control Interaction -->
+		<interactionClass>
+			<name>ControlCommands</name>
+			<sharing>PublishSubscribe</sharing>
+			<transportation>HLAreliable</transportation>
+			<order>Receive</order>
+			<semantics>Used for execution control (e.g., RUNNING, FREEZE)</semantics>
+			<parameter>
+				<name>move</name>
+				<dataType>MTRMode</dataType>
+				<semantics>Execution mode transition request</semantics>
+			</parameter>
+		</interactionClass>
+		<!-- ✅ New Interaction -->
+		<interactionClass>
+			<name>HLAinteractionRoot</name>
+			<interactionClass>
+				<name>FederateMessage</name>
+				<sharing>PublishSubscribe</sharing>
+				<transportation>HLAreliable</transportation>
+				<order>Receive</order>
+				<semantics>General communication between federates</semantics>
+				<parameter>
+					<name>Sender</name>
+					<dataType>HLAunicodeString</dataType>
+					<semantics>Federate sending the message</semantics>
+				</parameter>
+				<parameter>
+					<name>Receiver</name>
+					<dataType>HLAunicodeString</dataType>
+					<semantics>Federate receiving the message (or ALL for broadcast)</semantics>
+				</parameter>
+				<parameter>
+					<name>MessageType</name>
+					<dataType>HLAunicodeString</dataType>
+					<semantics>Type of message (e.g., Request, Approval, Alert)</semantics>
+				</parameter>
+				<parameter>
+					<name>Content</name>
+					<dataType>HLAunicodeString</dataType>
+					<semantics>Message content</semantics>
+				</parameter>
+			</interactionClass>
+		</interactionClass>
+	</interactions>
+	<dataTypes>
+		<simpleDataTypes/>
+		<enumeratedDataTypes/>
+		<arrayDataTypes/>
+		<fixedRecordDataTypes/>
+		<variantRecordDataTypes/>
+	</dataTypes>
+	<notes/>
+</objectModel>

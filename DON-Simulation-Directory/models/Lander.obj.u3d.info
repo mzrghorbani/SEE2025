@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ObjectInfo version="1.0">
+    <OriginalFileInformation>
+        <File file="Lander.obj" type="Geometry" creationDate="2025-02-19T18:51:13.2154602Z" lastWriteDate="2025-02-19T18:49:06.6587739Z" SHA1Hash="39d87acbe74b0f3916133be2f280bea57afc5eae" />
+        <File file="C:\Users\mazia\SEE2025\DON-Simulation-Directory\models\Lander4.mtl " type="Materials" creationDate="0001-01-01T00:00:00.0000000" lastWriteDate="0001-01-01T00:00:00.0000000" SHA1Hash="" />
+    </OriginalFileInformation>
+    <Materials>
+        <Material id="default" name="default" shaderName="Specular">
+            <Attributes>
+                <Transparency value="1" />
+                <Color type="_Color" value="1 0 0 1" />
+                <Color type="_SpecColor" value="1 1 1 1" />
+                <Scalar type="_Shininess" value="0.5" />
+            </Attributes>
+        </Material>
+    </Materials>
+    <Meshes totalTriangles="1420" totalVertices="2396">
+        <Mesh name="Lander.obj_Mesh" triangles="1420" vertices="2396">
+            <SubMeshes>
+                <SubMesh triangles="1420" vertices="2396">
+                    <SubMeshMaterials>
+                        <SubMeshMaterial index="0" />
+                    </SubMeshMaterials>
+                </SubMesh>
+            </SubMeshes>
+        </Mesh>
+    </Meshes>
+</ObjectInfo>

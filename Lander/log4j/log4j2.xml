@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="warn" monitorInterval="50">
+	<Properties>
+		<Property name="filename">logs/skf</Property>
+	</Properties>
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+		</Console>
+		<RollingFile name="skflogFile" fileName="${filename}.log" filePattern="${filename}-%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+		</RollingFile>
+	</appenders>
+	<Loggers>
+      <!-- Change Root Logger Level from INFO to WARN (or ERROR) to reduce prints -->
+      <Root level="WARN">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="skflogFile"/>
+      </Root>
+      <!-- Reduce logging from ReferenceFrameObject -->
+      <Logger name="siso.smackdown.frame.ReferenceFrameObject" level="WARN"/>
+    </Loggers>
+</configuration>
