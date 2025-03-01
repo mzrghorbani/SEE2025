@@ -24,7 +24,7 @@ public class Spaceport {
 	
 	@Attribute(name = "type", coder = HLAunicodeStringCoder.class)
 	private String type = null;
-	
+
 	@Attribute(name = "position", coder = HLAPositionCoder.class)
 	private Position position = null;
 	
