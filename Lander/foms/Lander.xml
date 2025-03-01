@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <objectModel
-	xmlns:schemaLocation="http://standards.ieee.org/IEEE1516-2010"
-	xmlns="http://standards.ieee.org/IEEE1516-2010"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://standards.ieee.org/IEEE1516-2010" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 IEEE1516-DIF-2010.xsd"
+	>
 	<modelIdentification>
 		<name>New Module</name>
 		<type>FOM</type>
@@ -23,72 +24,54 @@
 					<name>Spaceport</name>
 					<sharing>PublishSubscribe</sharing>
 					<semantics></semantics>
+					<attribute>
+						<name>position</name>
+                        <dataType>Position</dataType>
+                        <updateType>Periodic</updateType>
+                        <updateCondition></updateCondition>
+                        <ownership>NoTransfer</ownership>
+                        <sharing>PublishSubscribe</sharing>
+                        <transportation>HLAreliable</transportation>
+                        <order>Receive</order>
+                        <semantics>This represents the position of the Spaceport.</semantics>
+					</attribute>
 				</objectClass>
-			</objectClass>
-			<objectClass>
+				<objectClass>
 					<name>Lander</name>
 					<sharing>PublishSubscribe</sharing>
 					<semantics></semantics>
+					<attribute>
+						<name>position</name>
+                        <dataType>Position</dataType>
+                        <updateType>Periodic</updateType>
+                        <updateCondition></updateCondition>
+                        <ownership>NoTransfer</ownership>
+                        <sharing>PublishSubscribe</sharing>
+                        <transportation>HLAreliable</transportation>
+                        <order>Receive</order>
+                        <semantics>This represents the position of the Spaceport.</semantics>
+					</attribute>
                 </objectClass>
-                <objectClass>
-                    <name>Position</name>
-                    <dataType>HLAPositionCoder</dataType>
-                    <sharing>PublishSubscribe</sharing>
-                    <semantics></semantics>
-                    <dataType>
-                        <name>x</name>
-                        <dataType>HLAfloat64BE</dataType>
-                        <updateType>NA</updateType>
-                        <updateCondition></updateCondition>
-                        <ownership>NoTransfer</ownership>
-                        <sharing>PublishSubscribe</sharing>
-                        <transportation>HLAreliable</transportation>
-                        <order>Receive</order>
-                        <semantics></semantics>
-                    </dataType>
-                    <dataType>
-                        <name>y</name>
-                        <dataType>HLAfloat64BE</dataType>
-                        <updateType>NA</updateType>
-                        <updateCondition></updateCondition>
-                        <ownership>NoTransfer</ownership>
-                        <sharing>PublishSubscribe</sharing>
-                        <transportation>HLAreliable</transportation>
-                        <order>Receive</order>
-                        <semantics></semantics>
-                    </dataType>
-                    <dataType>
-                        <name>z</name>
-                        <dataType>HLAfloat64BE</dataType>
-                        <updateType>NA</updateType>
-                        <updateCondition></updateCondition>
-                        <ownership>NoTransfer</ownership>
-                        <sharing>PublishSubscribe</sharing>
-                        <transportation>HLAreliable</transportation>
-                        <order>Receive</order>
-                        <semantics></semantics>
-                    </dataType>
-                </objectClass>
-            </objectClass>
+			</objectClass>
+		</objectClass>
 	</objects>
 	<interactions>
-		<name>HLAinteractionRoot</name>
-		<!-- ✅ Existing MTR/Execution Control Interaction -->
-		<interactionClass>
-			<name>ControlCommands</name>
-			<sharing>PublishSubscribe</sharing>
-			<transportation>HLAreliable</transportation>
-			<order>Receive</order>
-			<semantics>Used for execution control (e.g., RUNNING, FREEZE)</semantics>
-			<parameter>
-				<name>move</name>
-				<dataType>MTRMode</dataType>
-				<semantics>Execution mode transition request</semantics>
-			</parameter>
-		</interactionClass>
-		<!-- ✅ New Interaction -->
 		<interactionClass>
 			<name>HLAinteractionRoot</name>
+			<!-- ✅ Existing MTR/Execution Control Interaction -->
+			<interactionClass>
+				<name>ControlCommands</name>
+				<sharing>PublishSubscribe</sharing>
+				<transportation>HLAreliable</transportation>
+				<order>Receive</order>
+				<semantics>Used for execution control (e.g., RUNNING, FREEZE)</semantics>
+				<parameter>
+					<name>move</name>
+					<dataType>MTRMode</dataType>
+					<semantics>Execution mode transition request</semantics>
+				</parameter>
+			</interactionClass>
+			<!-- ✅ New Interaction -->
 			<interactionClass>
 				<name>FederateMessage</name>
 				<sharing>PublishSubscribe</sharing>

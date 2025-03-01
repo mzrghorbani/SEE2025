@@ -78,7 +78,7 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 	
     private ReferenceFrame currentReferenceFrame = null;
     
-    private FederateMessage message;
+    private FederateMessage message = null;
     private KeyPressListener keyListener = new KeyPressListener("Lander Input"); 
     
     private ConsoleColors color = null;
@@ -89,6 +89,9 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 		this.mtr = new ModeTransitionRequest();
 		this.format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		// Initialize the message object with a empty message
+		this.message = new FederateMessage();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -264,6 +267,7 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 	        
 	        if (this.spaceport.getPosition() != null) {
 	            System.out.println("[Lander] successfully received Spaceport position.");
+				System.out.println("[Lander] Spaceport Position: " + this.spaceport.getPosition()); // Debugging
 
 	        } else {
 	            System.out.println("[Lander] Position is NULL, no position data received.");
