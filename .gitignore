@@ -1,5 +1,14 @@
 DON-Simulation-Directory/Terrain/*
-Lander/logs/*
-HLAtoDON/doc/*
-SpaceReferenceFramePublisher/logs/*
-Spaceport/logs/*
+
+# Ignore all bin directories in all projects
+**/bin/
+
+# Ignore all compiled Java class files
+*.class
+
+# Ignore all temporary files
+*.log
+*.tmp
+
+# Ignore Eclipse project metadata files
+**/*.project
