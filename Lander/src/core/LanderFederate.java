@@ -31,15 +31,12 @@ import hla.rti1516e.exceptions.SaveInProgress;
 import hla.rti1516e.exceptions.SynchronizationPointLabelNotAnnounced;
 import hla.rti1516e.exceptions.UnsupportedCallbackModel;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Scanner;
 import java.util.TimeZone;
 
-import model.HLAPositionCoder;
 import model.Lander;
 import model.Position;
 import model.Quaternion;
@@ -80,8 +77,6 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
     
     private FederateMessage message = null;
     private KeyPressListener keyListener = new KeyPressListener("Lander Input"); 
-    
-    private ConsoleColors color = null;
 	
 	public LanderFederate(SEEAbstractFederateAmbassador seefedamb, Lander lander) {
 		super(seefedamb);

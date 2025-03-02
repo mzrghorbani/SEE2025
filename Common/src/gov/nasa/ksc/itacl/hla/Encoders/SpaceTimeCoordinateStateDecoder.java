@@ -6,8 +6,6 @@ import hla.rti1516e.encoding.DataElement;
 import hla.rti1516e.encoding.DecoderException;
 import hla.rti1516e.encoding.EncoderFactory;
 import hla.rti1516e.encoding.HLAfixedRecord;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SpaceTimeCoordinateStateDecoder {
 

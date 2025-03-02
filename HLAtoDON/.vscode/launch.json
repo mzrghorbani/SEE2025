@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "HLAtoDONFederate",
+            "request": "launch",
+            "mainClass": "gov.nasa.ksc.itacl.HLAtoDON.HLAtoDONFederate",
+            "projectName": "HLAtoDON_ab079288"
+        },
+        {
+            "type": "java",
+            "name": "HLAtoDONFederate-VMArgs",
+            "request": "launch",
+            "mainClass": "gov.nasa.ksc.itacl.HLAtoDON.HLAtoDONFederate",
+            "vmArgs": "--add-opens=java.base/java.io=ALL-UNNAMED -XX:+ShowCodeDetailsInExceptionMessages",
+            "args": ["-buildfile", "build.xml"]
+        }
+    ]
+}

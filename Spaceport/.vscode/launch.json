@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "request": "launch",
+            "name": "Launch SpaceportMain",
+            "mainClass": "SpaceportMain",
+            "vmArgs": "--add-opens=java.base/java.io=ALL-UNNAMED -XX:+ShowCodeDetailsInExceptionMessages -Dlog4j.configurationFile=log4j/log4j2.xml"
+        }
+    ]
+}

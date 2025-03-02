@@ -12,3 +12,4 @@ DON-Simulation-Directory/Terrain/*
 
 # Ignore Eclipse project metadata files
 **/*.project
+/.metadata/

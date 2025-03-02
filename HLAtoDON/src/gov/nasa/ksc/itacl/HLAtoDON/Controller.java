@@ -4,8 +4,6 @@ import gov.nasa.ksc.itacl.Utilities.*;
 import gov.nasa.ksc.itacl.mpc.MPCSocketServer;
 import gov.nasa.ksc.itacl.mpc.models.Telemetry;
 
-import utils.ConsoleColors;
-
 public class Controller {
 	
 	private HlaInterface hlaInterface;

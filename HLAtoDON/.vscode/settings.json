@@ -1,0 +1,18 @@
+{
+    "java.project.sourcePaths": [
+        "src",
+        "../Common/src",
+        "../MPCNetworkSimServer/src",
+        "../MPCTelemetryWriter/src",
+        "../SpaceReferenceFramePublisher/src"
+    ],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "jat/lib/**/*.jar",
+        "../Common/lib/**/*.jar",
+        "../MPCNetworkSimServer/lib/**/*.jar",
+        "../MPCTelemetryWriter/lib/**/*.jar",
+        "../SpaceReferenceFramePublisher/lib/**/*.jar"
+    ]
+}
