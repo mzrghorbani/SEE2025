@@ -39,6 +39,9 @@ import java.text.SimpleDateFormat;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TimeZone;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import model.Spaceport;
 import model.Lander;
@@ -77,6 +80,9 @@ public class SpaceportFederate extends SEEAbstractFederate implements Observer {
     
     private FederateMessage message = null;
     private KeyPressListener keyListener = new KeyPressListener("Spaceport Input");
+    
+    private ScheduledExecutorService scheduler;
+    private volatile boolean awaitingResponse = false; 
 	
 	public SpaceportFederate(SEEAbstractFederateAmbassador seefedamb, Spaceport spaceport) {
 		super(seefedamb);
@@ -202,13 +208,13 @@ public class SpaceportFederate extends SEEAbstractFederate implements Observer {
 
 	    try {
 	        super.updateElement(this.spaceport);
-	        System.out.println("[Spaceport] published status: " + this.spaceport);
+	        System.out.println("[Spaceport] Published " + this.spaceport.getPosition());
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
 		
 		if (keyListener.hasKeyPress()) {
-	        handleRequests(keyListener.getKey());  
+			sendMessages(keyListener.getKey());  
 	        keyListener.reset();  // Prevents repeated execution
 	    }
 	}
@@ -243,7 +249,7 @@ public class SpaceportFederate extends SEEAbstractFederate implements Observer {
 	        }
 	    } 
 	    else if (arg1 instanceof FederateMessage) {
-	        handleResponses((FederateMessage) arg1);
+	    	receiveMessages((FederateMessage) arg1);
 	    } 
 	    else if (arg1 instanceof ReferenceFrame) {
 	        this.currentReferenceFrame = (ReferenceFrame) arg1;
@@ -252,7 +258,7 @@ public class SpaceportFederate extends SEEAbstractFederate implements Observer {
 	    	this.lander = (Lander) arg1;
 	    	
 	    	if (this.lander.getPosition() != null) {
-				System.out.println("[Spaceport] received Lander Position" + this.lander.getPosition()); // Debugging
+				System.out.println("[Spaceport] Received Lander " + this.lander.getPosition()); // Debugging
 
 	        } else {
 	            System.out.println("[Lander] Position is NULL, no position data received.");
@@ -276,39 +282,86 @@ public class SpaceportFederate extends SEEAbstractFederate implements Observer {
 	        ConsoleColors.logError("[Spaceport] Error sending message: " + e.getMessage());
 	    }
 	}
-	
-	private void handleResponses(FederateMessage message) {
 
-	    switch (message.getMessageType()) {
-	        case "LANDING_REQUEST":
-	            ConsoleColors.logInfo("[Spaceport] received " + message.getContent() + " from " + message.getSender() + "! Press 'A' to Approve.");
+	private void sendMessages(String key) {
+	    switch (key.toUpperCase()) {
+	            
+	         // Phase A: Spaceport → Beacon (Acknowledging Lander's Approach)
+	        case "A":
+	            sendMessage("Spaceport", "Beacon", "BRUNEL_SPACEPORT_BEACON_ACKNOWLEDGED", "Lander Approaching Acknowledged!");
+	            ConsoleColors.logInfo("[Spaceport] [Phase A] [To Beacon] Lander Approaching Acknowledged!");
+	            stopAwaitingResponseTask();  // End waiting for Beacon's original message
 	            break;
-
-	        case "PROCEED_LANDING":
-	        	ConsoleColors.logInfo("[Spaceport] received " + message.getContent() + " from " + message.getSender() + "! Press 'D' to proceed.");
+	            
+	         // Phase B: Spaceport → CableCar (Notifying of Arrival)
+	        case "B":
+	            sendMessage("Spaceport", "CableCar", "BRUNEL_SPACEPORT_CABLECAR_LANDER_ARRIVING", "Lander Approaching...");
+	            ConsoleColors.logInfo("[Spaceport] [Phase B] [To CableCar] Lander Approaching...");
+	            startAwaitingResponseTask(); // Begin waiting for CableCar acknowledgment
+	            break;
+	            
+	         // Phase C: Spaceport → Lander (Landing Acknowledgment)
+	        case "C":
+	            sendMessage("Spaceport", "Lander", "BRUNEL_SPACEPORT_LANDER_ACKNOWLEDGED", "Landing Request Approved.");
+	            ConsoleColors.logInfo("[Spaceport] [Phase C] [To Lander] Acknowledged Lander Request.");
+	            stopAwaitingResponseTask(); // Stop waiting for Lander's request
 	            break;
 
 	        default:
-	        	ConsoleColors.logInfo("[Spaceport] Unknown message type: " + message.getMessageType());
+	            ConsoleColors.logInfo("[Spaceport] Unknown command: " + key);
 	            break;
 	    }
 	}
 	
-	private void handleRequests(String key) {
-	    switch (key.toUpperCase()) {
-	        case "A":
-	            sendMessage("Lander", "Spaceport", "APPROVED_LANDING", "Approved Landing");
-	            ConsoleColors.logInfo("[Spaceport] Awaiting Response...");
-	            break;
-
-	        case "D":
-	            sendMessage("Lander", "Spaceport", "ACKNOWLEDGE", "Acknowledge Landing");
-	            ConsoleColors.logInfo("[Spaceport] Awaiting Response...");
-	            break;
+	private void receiveMessages(FederateMessage message) {
+	    switch (message.getMessageType()) {
+	    
+	        // From Beacon → Phase A
+		    case "UCF_BEACON_SPACEPORT_LANDER_APPROACHING":
+	    		ConsoleColors.logInfo("[Spaceport] [Phase A] [From Beacon] " + message.getContent() + " — Press 'A' to acknowledge.");
+	            startAwaitingResponseTask(); // Start background status printing
+            break;
+            
+            // From CableCar → Phase B
+		    case "FACENS_CABLECAR_SPACEPORT_ACKNOWLEDGED":
+	    		ConsoleColors.logInfo("[Spaceport] [Phase B] [From CableCar] " + message.getContent() + " — Press 'B' to acknowledge.");
+	    		stopAwaitingResponseTask(); // Stop background status printing
+            break;
+            
+            // From Lander → Phase C
+		    case "BRUNEL_LANDER_SPACEPORT_REQUEST_LANDING":
+	    		ConsoleColors.logInfo("[Spaceport] [Phase C] [From Lander] " + message.getContent() + " — Press 'C' to acknowledge.");
+	            startAwaitingResponseTask(); // Start background status printing
+            break;
 
 	        default:
-	        	ConsoleColors.logInfo("[Lander] Unknown command: " + key);
+	            ConsoleColors.logInfo("[Spaceport] Unknown message type: " + message.getMessageType());
 	            break;
+	    }
+	}
+	
+	private void startAwaitingResponseTask() {
+		awaitingResponse = true; // Make sure flag is updated first
+	    if (scheduler != null && !scheduler.isShutdown()) {
+	        return; // Avoid creating multiple schedulers
+	    }
+
+	    scheduler = Executors.newSingleThreadScheduledExecutor();
+
+	    scheduler.scheduleAtFixedRate(() -> {
+	        if (!awaitingResponse) {
+	            stopAwaitingResponseTask(); // Stop scheduler when response is received
+	            return;
+	        }
+	        ConsoleColors.logInfo("[Spaceport] Still awaiting Lander response..."); // Fixed incorrect log
+	    }, 0, 5, TimeUnit.SECONDS); // Runs every 5 seconds
+	}
+	
+	private void stopAwaitingResponseTask() {
+	    awaitingResponse = false; // Make sure flag is updated first
+	    if (scheduler != null && !scheduler.isShutdown()) {
+	        scheduler.shutdownNow(); // Forces immediate shutdown
+	        ConsoleColors.logInfo("[Spaceport] Stopped waiting for response.");
 	    }
 	}
 }

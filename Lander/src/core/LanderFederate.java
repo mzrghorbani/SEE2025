@@ -36,6 +36,9 @@ import java.text.SimpleDateFormat;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TimeZone;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import model.Lander;
 import model.Position;
@@ -77,6 +80,9 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
     
     private FederateMessage message = null;
     private KeyPressListener keyListener = new KeyPressListener("Lander Input"); 
+    
+    private ScheduledExecutorService scheduler;
+    private volatile boolean awaitingResponse = false; 
 	
 	public LanderFederate(SEEAbstractFederateAmbassador seefedamb, Lander lander) {
 		super(seefedamb);
@@ -185,13 +191,35 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 
 	@Override
 	protected void doAction() {
-		
-		this.lander.info(currentReferenceFrame);
 
 	    Position currentPos = this.lander.getPosition();
 	    double x = currentPos.getX() + 0; 
 	    double y = currentPos.getY() - 0;
-	    double z = currentPos.getZ() - 100 ;
+	    
+	    // Advancing in Z direction
+	    double targetZ = -5300;
+	    double currentZ = currentPos.getZ();
+
+	    double newZ = currentZ;
+
+	    if (currentZ > targetZ) {
+	        newZ = currentZ - 100;
+
+	        // Ensure we don't overshoot the platform
+	        if (newZ < targetZ) {
+	            newZ = targetZ;
+	        }
+	    } else {
+	        // Already at or below platform — stay put
+	        newZ = targetZ;
+	    }
+	    
+	    if (newZ == targetZ) {
+	        System.out.println("[Lander] Touchdown! Lander has reached the platform.");
+	    } else {
+	        double distance = Math.abs(targetZ - newZ);
+	        System.out.printf("[Lander Status] Descending — %.2f metres to platform...\n", distance);
+	    }
    
 	    Quaternion currentQuat = this.lander.getQuaternion();
 	    double w = currentQuat.getW(); 
@@ -199,17 +227,17 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 	    double qy = currentQuat.getY();
 	    double qz = currentQuat.getZ();
 	    
-	    this.lander.updateState(x, y, z, w, qx, qy, qz);
+	    this.lander.updateState(x, y, newZ, w, qx, qy, qz);
 	    
 	    try {
 	        super.updateElement(this.lander);
-	        System.out.println("[Lander] published status: " + this.lander);
+	        System.out.println("[Lander] Published " + this.lander.getPosition());
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
 	    
 	    if (keyListener.hasKeyPress()) {
-	        handleRequests(keyListener.getKey());  
+	    	sendMessages(keyListener.getKey());  
 	        keyListener.reset();  // Prevents repeated execution
 	    }
 	}
@@ -252,7 +280,7 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 	        }
 	    } 
 	    else if (arg1 instanceof FederateMessage) {
-	        handleResponses((FederateMessage) arg1);
+	    	receiveMessages((FederateMessage) arg1);
 	    } 
 	    else if (arg1 instanceof ReferenceFrame) {
 	        this.currentReferenceFrame = (ReferenceFrame) arg1;
@@ -261,8 +289,7 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 	    	this.spaceport = (Spaceport) arg1; 
 	        
 	        if (this.spaceport.getPosition() != null) {
-	            System.out.println("[Lander] successfully received Spaceport position.");
-				System.out.println("[Lander] Spaceport Position: " + this.spaceport.getPosition()); // Debugging
+				System.out.println("[Lander] Recieved Spaceport " + this.spaceport.getPosition()); // Debugging
 
 	        } else {
 	            System.out.println("[Lander] Position is NULL, no position data received.");
@@ -288,39 +315,61 @@ public class LanderFederate extends SEEAbstractFederate implements Observer {
 	        ConsoleColors.logError("[Lander] Error sending message: " + e.getMessage());
 	    }
 	}
-	
-	private void handleRequests(String key) {
+
+	private void sendMessages(String key) {
 	    switch (key.toUpperCase()) {
-        case "L":  
-            sendMessage("Lander", "Spaceport", "LANDING_REQUEST", "Landing Request");
-            ConsoleColors.logInfo("[Lander] Awaiting Response...");
-            break;
 
-        case "P": 
-            sendMessage("Lander", "Spaceport", "PROCEED_LANDING", "Lander Proceeding to Next Phase");
-            ConsoleColors.logInfo("[Lander] Awaiting Response...");
-            break;
-
-        default:
-        	ConsoleColors.logInfo("[Lander] Unknown key pressed: " + key);
-            break;
-	    }
-	}
-	
-	private void handleResponses(FederateMessage message) {
-
-	    switch (message.getMessageType()) {
-	        case "APPROVED_LANDING":
-	        	ConsoleColors.logInfo("[Lander] Received " + message.getContent() + " from " + message.getReceiver() + "! Press 'L' to acknowledge.");
-	            break;
-
-	        case "ACKNOWLEDGE":
-	        	ConsoleColors.logInfo("[Lander] Received " + message.getContent() + " from " + message.getReceiver() + "! Press 'P' to proceed.");
+	        // Phase C: Lander → Spaceport (Requesting Landing)
+	        case "C":
+	            sendMessage("Lander", "Spaceport", "BRUNEL_LANDER_SPACEPORT_REQUEST_LANDING", "Landing Request...");
+	            ConsoleColors.logInfo("[Lander] [Phase C] [To Spaceport] Landing Request sent. Awaiting acknowledgment...");
+	            startAwaitingResponseTask();
 	            break;
 
 	        default:
-	        	ConsoleColors.logInfo("[Lander] Unknown message type: " + message.getMessageType());
+	            ConsoleColors.logInfo("[Lander] Unknown key pressed: '" + key + "'. Valid key: C");
 	            break;
 	    }
 	}
+	
+	private void receiveMessages(FederateMessage message) {
+	    switch (message.getMessageType()) {
+
+	        // Phase C: From Spaceport → Lander (Acknowledging Landing)
+	        case "BRUNEL_SPACEPORT_LANDER_ACKNOWLEDGED":
+	            ConsoleColors.logInfo("[Lander] [Phase C] [From Spaceport] " + message.getContent() + " — Press 'C' to proceed.");
+	            stopAwaitingResponseTask();
+	            break;
+
+	        default:
+	            ConsoleColors.logInfo("[Lander] Unknown message type: " + message.getMessageType());
+	            break;
+	    }
+	}
+	
+	private void startAwaitingResponseTask() {
+		awaitingResponse = true; // Make sure flag is updated first
+	    if (scheduler != null && !scheduler.isShutdown()) {
+	        return; // Avoid creating multiple schedulers
+	    }
+
+	    scheduler = Executors.newSingleThreadScheduledExecutor();
+
+	    scheduler.scheduleAtFixedRate(() -> {
+	        if (!awaitingResponse) {
+	            stopAwaitingResponseTask(); // Stop scheduler when response is received
+	            return;
+	        }
+	        ConsoleColors.logInfo("[Lander] Still awaiting Spaceport response..."); // Fixed incorrect log
+	    }, 0, 5, TimeUnit.SECONDS); // Runs every 5 seconds
+	}
+	
+	private void stopAwaitingResponseTask() {
+	    awaitingResponse = false; // Make sure flag is updated first
+	    if (scheduler != null && !scheduler.isShutdown()) {
+	        scheduler.shutdownNow(); // Forces immediate shutdown
+	        ConsoleColors.logInfo("[Lander] Stopped waiting for response.");
+	    }
+	}
+	
 }
